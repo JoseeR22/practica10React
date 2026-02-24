@@ -4,14 +4,18 @@ import { searchGames } from "../services/rawg";
 import Loading from "../components/Loading";
 import ErrorState from "../components/ErrorState";
 import GameCard from "../components/GameCard";
+import Pagination from "../components/Pagination";
 
 export default function Search() {
   const [params] = useSearchParams();
   const q = params.get("q") || "";
+  const page = parseInt(params.get("page") || "1", 10);
 
   const [results, setResults] = useState([]);
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrev, setHasPrev] = useState(false);
 
   const title = useMemo(() => (q ? `Resultados para “${q}”` : "Buscar juegos"), [q]);
 
@@ -23,15 +27,19 @@ export default function Search() {
         setResults([]);
         setStatus("idle");
         setError("");
+        setHasNext(false);
+        setHasPrev(false);
         return;
       }
 
       try {
         setStatus("loading");
         setError("");
-        const data = await searchGames(q, { page: 1, pageSize: 24 });
+        const data = await searchGames(q, { page, pageSize: 24 });
         if (cancelled) return;
         setResults(data.results || []);
+        setHasNext(!!data.next);
+        setHasPrev(!!data.previous);
         setStatus("ok");
       } catch (e) {
         if (cancelled) return;
@@ -44,7 +52,7 @@ export default function Search() {
     return () => {
       cancelled = true;
     };
-  }, [q]);
+  }, [q, page]);
 
   return (
     <div className="space-y-6">
@@ -68,6 +76,10 @@ export default function Search() {
           <GameCard key={g.id} game={g} />
         ))}
       </div>
+
+      {results.length > 0 && (
+        <Pagination hasNext={hasNext} hasPrev={hasPrev} />
+      )}
     </div>
   );
 }

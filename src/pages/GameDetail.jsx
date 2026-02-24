@@ -31,8 +31,10 @@ export default function GameDetail() {
     if (status === "error") return <ErrorState message={error} onRetry={load} />;
     if (!game) return null;
 
-    const platforms = (game.platforms || []).map((p) => p.platform?.name).filter(Boolean);
-    const genres = (game.genres || []).map((g) => g.name).filter(Boolean);
+    const platforms = (game.platforms || []).map((p) => ({ label: p.platform?.name })).filter((p) => p.label);
+    const genres = (game.genres || []).map((g) => ({ label: g.name, url: `/genres/${g.slug}` })).filter((g) => g.label);
+    const tags = (game.tags || []).map((t) => ({ label: t.name, url: `/tags/${t.slug}` })).filter((t) => t.label);
+    const publishers = (game.publishers || []).map((p) => ({ label: p.name, url: `/publishers/${p.id}` })).filter((p) => p.label);
 
     return (
         <div className="space-y-6">
@@ -41,7 +43,7 @@ export default function GameDetail() {
             </Link>
 
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
-                <div className="aspect-[21/9] w-full bg-black/30">
+                <div className="aspect-21/9 w-full bg-black/30">
                     {game.background_image ? (
                         <img src={game.background_image} alt={game.name} className="h-full w-full object-cover" />
                     ) : null}
@@ -65,6 +67,8 @@ export default function GameDetail() {
                     <div className="grid gap-4 md:grid-cols-2">
                         <InfoBlock title="Plataformas" items={platforms} />
                         <InfoBlock title="Géneros" items={genres} />
+                        <InfoBlock title="Tags" items={tags} />
+                        <InfoBlock title="Publishers" items={publishers} />
                     </div>
 
                     <div>
@@ -85,11 +89,20 @@ function InfoBlock({ title, items }) {
             <div className="text-xs font-semibold text-zinc-200">{title}</div>
             <div className="mt-2 flex flex-wrap gap-2">
                 {items.length ? (
-                    items.map((x) => (
-                        <span key={x} className="rounded-full bg-white/10 px-3 py-1 text-xs text-zinc-200">
-                            {x}
-                        </span>
-                    ))
+                    items.map((x, i) => {
+                        const content = (
+                            <span className="inline-block rounded-full bg-white/10 px-3 py-1 text-xs text-zinc-200 hover:bg-white/20 transition-colors">
+                                {x.label}
+                            </span>
+                        );
+                        return x.url ? (
+                            <Link key={i} to={x.url}>
+                                {content}
+                            </Link>
+                        ) : (
+                            <span key={i}>{content}</span>
+                        );
+                    })
                 ) : (
                     <span className="text-xs text-zinc-400">No disponible</span>
                 )}

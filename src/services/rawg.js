@@ -31,8 +31,8 @@ export async function request(endpoint, params = {}) {
   return res.json();
 }
 
-export function getGames({ page = 1, pageSize = 20, ordering = "-rating" } = {}) {
-  return request("/games", { page, page_size: pageSize, ordering });
+export function getGames({ page = 1, pageSize = 20, ordering = "-rating", tags, genres, publishers } = {}) {
+  return request("/games", { page, page_size: pageSize, ordering, tags, genres, publishers });
 }
 
 export function searchGames(query, { page = 1, pageSize = 20 } = {}) {
@@ -41,4 +41,16 @@ export function searchGames(query, { page = 1, pageSize = 20 } = {}) {
 
 export function getGameDetails(id) {
   return request(`/games/${id}`);
+}
+
+export function getPublishers({ page = 1, pageSize = 20 } = {}) {
+  return request("/publishers", { page, page_size: pageSize });
+}
+
+export function searchPublishers(query, { page = 1, pageSize = 20 } = {}) {
+  return request("/publishers", { search: query, page, page_size: pageSize });
+}
+
+export function getPublisherDetails(id) {
+  return request(`/publishers/${id}`);
 }

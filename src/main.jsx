@@ -10,6 +10,9 @@ import Home from "./pages/Home";
 import Search from "./pages/Search";
 import Favorites from "./pages/Favorites";
 import GameDetail from "./pages/GameDetail";
+import FilteredGames from "./pages/FilteredGames";
+import Publishers from "./pages/Publishers";
+import PublisherDetail from "./pages/PublisherDetail";
 
 import NotFound from "./pages/NotFound";
 
@@ -23,6 +26,10 @@ const router = createBrowserRouter([
       { path: "search", element: <Search /> },
       { path: "favorites", element: <Favorites /> },
       { path: "games/:id", element: <GameDetail /> },
+      { path: "tags/:slug", element: <FilteredGames type="tags" /> },
+      { path: "genres/:slug", element: <FilteredGames type="genres" /> },
+      { path: "publishers", element: <Publishers /> },
+      { path: "publishers/:id", element: <PublisherDetail /> },
     ],
   },
 ]);

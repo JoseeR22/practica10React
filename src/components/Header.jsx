@@ -25,6 +25,9 @@ export default function Header() {
           <NavLink to="/search" className={({ isActive }) => isActive ? "text-white" : "hover:text-white"}>
             Buscar
           </NavLink>
+          <NavLink to="/publishers" className={({ isActive }) => isActive ? "text-white" : "hover:text-white"}>
+            Publishers
+          </NavLink>
           <NavLink to="/favorites" className={({ isActive }) => isActive ? "text-white" : "hover:text-white"}>
             <span className="inline-flex items-center gap-2">
               Favoritos
