@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
 import "./index.css";
-
-import { FavoritesProvider } from "./context/FavoritesContext";
 
 import AppLayout from "./layouts/AppLayout";
 import Home from "./pages/Home";
@@ -13,6 +13,8 @@ import GameDetail from "./pages/GameDetail";
 import FilteredGames from "./pages/FilteredGames";
 import Publishers from "./pages/Publishers";
 import PublisherDetail from "./pages/PublisherDetail";
+import Events from "./pages/Events";
+import MyEvents from "./pages/MyEvents";
 
 import NotFound from "./pages/NotFound";
 
@@ -30,14 +32,16 @@ const router = createBrowserRouter([
       { path: "genres/:slug", element: <FilteredGames type="genres" /> },
       { path: "publishers", element: <Publishers /> },
       { path: "publishers/:id", element: <PublisherDetail /> },
+      { path: "events", element: <Events /> },
+      { path: "my-events", element: <MyEvents /> },
     ],
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <FavoritesProvider>
+    <Provider store={store}>
       <RouterProvider router={router} />
-    </FavoritesProvider>
+    </Provider>
   </React.StrictMode>
 );

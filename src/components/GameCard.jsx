@@ -1,21 +1,23 @@
 import { Link } from "react-router-dom";
-import { useFavorites } from "../context/FavoritesContext";
+import { useSelector, useDispatch } from "react-redux";
+import { toggleFavorite } from "../store/slices/gamesSlice";
 
 export default function GameCard({ game }) {
-  const { isFavorite, toggleFavorite } = useFavorites();
-  const fav = isFavorite(game.id);
+  const dispatch = useDispatch();
+  const favorites = useSelector((state) => state.games.favorites);
+  const fav = favorites.some((g) => g.id === game.id);
 
   function onFavClick(e) {
     e.preventDefault(); // evita navegar
     e.stopPropagation();
     // guardamos lo necesario para pintar cards
-    toggleFavorite({
+    dispatch(toggleFavorite({
       id: game.id,
       name: game.name,
       rating: game.rating,
       released: game.released,
       background_image: game.background_image,
-    });
+    }));
   }
 
   return (
@@ -23,7 +25,7 @@ export default function GameCard({ game }) {
       to={`/games/${game.id}`}
       className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 hover:border-white/20 transition"
     >
-      <div className="aspect-[16/10] w-full bg-black/30">
+      <div className="aspect-16/10 w-full bg-black/30">
         {game.background_image ? (
           <img
             src={game.background_image}
@@ -38,7 +40,7 @@ export default function GameCard({ game }) {
         )}
       </div>
 
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-90" />
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent opacity-90" />
 
       <div className="absolute left-4 top-4 flex items-center gap-2">
         <span className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-xs text-zinc-200 backdrop-blur">

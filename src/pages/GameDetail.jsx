@@ -1,31 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getGameDetails } from "../services/rawg";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchGameDetailsThunk, toggleFavorite } from "../store/slices/gamesSlice";
 import Loading from "../components/Loading";
 import ErrorState from "../components/ErrorState";
 
 export default function GameDetail() {
     const { id } = useParams();
-    const [game, setGame] = useState(null);
-    const [status, setStatus] = useState("loading");
-    const [error, setError] = useState("");
+    const dispatch = useDispatch();
+    const game = useSelector((state) => state.games.gameDetails.data);
+    const status = useSelector((state) => state.games.gameDetails.status);
+    const error = useSelector((state) => state.games.gameDetails.error);
+    const favorites = useSelector((state) => state.games.favorites);
+    const isFav = game ? favorites.some((g) => g.id === game.id) : false;
 
     async function load() {
-        try {
-            setStatus("loading");
-            setError("");
-            const data = await getGameDetails(id);
-            setGame(data);
-            setStatus("ok");
-        } catch (e) {
-            setError(e?.message || "Error desconocido");
-            setStatus("error");
-        }
+        dispatch(fetchGameDetailsThunk(id));
     }
 
     useEffect(() => {
         load();
-    }, [id]);
+    }, [id, dispatch]);
 
     if (status === "loading") return <Loading label="Cargando detalle..." />;
     if (status === "error") return <ErrorState message={error} onRetry={load} />;
@@ -52,7 +47,22 @@ export default function GameDetail() {
                 <div className="p-6 space-y-4">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
-                            <h1 className="text-2xl font-semibold tracking-tight">{game.name}</h1>
+                            <h1 className="text-2xl font-semibold tracking-tight">
+                                {game.name}
+                                <button
+                                    onClick={() => dispatch(toggleFavorite({
+                                        id: game.id,
+                                        name: game.name,
+                                        rating: game.rating,
+                                        released: game.released,
+                                        background_image: game.background_image,
+                                    }))}
+                                    className="ml-4 inline-flex items-center justify-center rounded-full border border-white/10 bg-black/40 w-10 h-10 text-xl text-zinc-200 hover:bg-black/60 transition-colors"
+                                    title={isFav ? "Quitar de favoritos" : "Añadir a favoritos"}
+                                >
+                                    {isFav ? "★" : "☆"}
+                                </button>
+                            </h1>
                             <p className="mt-1 text-sm text-zinc-400">
                                 {game.released ? `Lanzamiento: ${game.released}` : "Sin fecha"}
                             </p>

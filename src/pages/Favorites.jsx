@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import { useFavorites } from "../context/FavoritesContext";
+import { useSelector } from "react-redux";
 import GameCard from "../components/GameCard";
 
 export default function Favorites() {
-  const { favorites, count } = useFavorites();
+  const favorites = useSelector((state) => state.games.favorites);
+  const count = favorites.length;
 
   return (
     <div className="space-y-6">

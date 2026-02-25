@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getGames } from "../services/rawg";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchGamesThunk } from "../store/slices/gamesSlice";
 import Loading from "../components/Loading";
 import ErrorState from "../components/ErrorState";
 import GameCarousel from "../components/GameCarrousel";
@@ -10,42 +11,17 @@ import Pagination from "../components/Pagination";
 export default function Home() {
     const [searchParams] = useSearchParams();
     const page = parseInt(searchParams.get("page") || "1", 10);
+    const dispatch = useDispatch();
 
-    const [featured, setFeatured] = useState([]);
-    const [list, setList] = useState([]);
-    const [status, setStatus] = useState("idle"); // idle | loading | error | ok
-    const [error, setError] = useState("");
-    const [hasNext, setHasNext] = useState(false);
-    const [hasPrev, setHasPrev] = useState(false);
+    const { data: list, featured, status, error, hasNext, hasPrev } = useSelector((state) => state.games.list);
 
     async function load() {
-        try {
-            setStatus("loading");
-            setError("");
-
-            const data = await getGames({ page, pageSize: 24, ordering: "-rating" });
-            const results = data.results || [];
-
-            if (page === 1) {
-                setFeatured(results.slice(0, 8));
-                setList(results.slice(8));
-            } else {
-                setFeatured([]);
-                setList(results);
-            }
-
-            setHasNext(!!data.next);
-            setHasPrev(!!data.previous);
-            setStatus("ok");
-        } catch (e) {
-            setError(e?.message || "Error desconocido");
-            setStatus("error");
-        }
+        dispatch(fetchGamesThunk({ page, pageSize: 24, ordering: "-rating" }));
     }
 
     useEffect(() => {
         load();
-    }, [page]);
+    }, [page, dispatch]);
 
     if (status === "loading") return <Loading label="Cargando juegos..." />;
     if (status === "error") return <ErrorState message={error} onRetry={load} />;
